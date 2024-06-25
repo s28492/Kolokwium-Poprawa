@@ -69,42 +69,41 @@ public class ClientRepository : IClientRepository
         return client;
     }
 
-    // public async Task<int> GetPrice(int id)
-    // {
-    //     Car car = null;
-    //
-    //     var query = @"SELECT PricePerDay FROM car 
-    //                      WHERE ID = @CarId";
-    //     using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-    //     {
-    //         using (SqlCommand command = new SqlCommand(query, connection))
-    //         {
-    //             Console.WriteLine(1);
-    //             command.Parameters.AddWithValue("@CarId", id);
-    //             await connection.OpenAsync();
-    //             Console.WriteLine(2);
-    //             using (SqlDataReader reader = await command.ExecuteReaderAsync())
-    //             {
-    //                 Console.WriteLine("Excecution query success");
-    //                 if (reader.Read())
-    //                 {
-    //                     Console.WriteLine(3);
-    //                     if (car == null)
-    //                     {
-    //                         Console.WriteLine("Proba");
-    //                         car = new Car
-    //                         {
-    //                             CarId = id,
-    //                             Price = reader.GetInt32(reader.GetOrdinal("Price"))
-    //                         };
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //
-    //     }
-    //     return car.Price;
-    // }
+    public async Task<int> GetPrice(int id)
+    {
+        Car car = null;
+
+        var query = @"SELECT ID, PricePerDay FROM cars WHERE ID = @CarId";
+        using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+        {
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@CarId", id);
+                await connection.OpenAsync();
+                using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                {
+                    if (reader.Read())
+                    {
+                        if (car == null)
+                        {
+                            car = new Car
+                            {
+                                CarId = reader.GetInt32(reader.GetOrdinal("ID")),
+                                Price = reader.GetInt32(reader.GetOrdinal("PricePerDay"))
+                            };
+                        }
+                    }
+                }
+            }
+
+        }
+        Console.WriteLine(car.Price);
+        if (car == null)
+        {
+            return 0;
+        }
+        return car.Price;
+    }
 
     public async Task<bool> AddClientWithRental(ClientRentalDTO.ClientDto client, ClientRentalDTO.RentalDto rental)
     {
@@ -134,9 +133,9 @@ public class ClientRepository : IClientRepository
                         clientId = (int)await command.ExecuteScalarAsync();
                     }
 
-                    // int price = await GetPrice(rental.CarId);
-
-
+                    
+                    int price = await GetPrice(rental.CarId);
+                    int totalPrice = (int) price * (rental.DateTo.Day - rental.DateFrom.Day);
                     if (clientId > 0)
                     {
                         using (var command = new SqlCommand(queryRental, connection, transaction))
@@ -145,11 +144,10 @@ public class ClientRepository : IClientRepository
                             command.Parameters.AddWithValue("@CarID", rental.CarId);
                             command.Parameters.AddWithValue("@DateFrom", rental.DateFrom);
                             command.Parameters.AddWithValue("@DateTo", rental.DateTo);
-                            command.Parameters.AddWithValue("@TotalPrice", rental.TotalPrice);
+                            command.Parameters.AddWithValue("@TotalPrice", totalPrice);
 
                             await command.ExecuteNonQueryAsync();
                         }
-                        Console.WriteLine(3);
                         transaction.Commit();
                     }
                 }

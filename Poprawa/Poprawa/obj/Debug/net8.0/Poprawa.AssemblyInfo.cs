@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Poprawa")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+820fe86d632ff07210a0d360b511cd805b0b3175")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+275858f28365592f3c57741890a433c82306180f")]
 [assembly: System.Reflection.AssemblyProductAttribute("Poprawa")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Poprawa")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
